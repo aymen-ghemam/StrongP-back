@@ -7,6 +7,7 @@ import authRouter from "./routes/auth.js";
 import productRouter from "./routes/products.js";
 import orderRouter from "./routes/orders.js";
 import adminRouter from "./routes/admin.js";
+import categoriesRouter from "./routes/category.js";
 
 const app = express();
 
@@ -69,6 +70,9 @@ console.log("✅ Order routes mounted at /api/orders");
 
 app.use("/api/admin", adminRouter);
 console.log("✅ Admin routes mounted at /api/admin");
+
+app.use("/api/categories", categoriesRouter);
+console.log("✅ Category routes mounted at /api/categories");
 
 // 404 handler
 app.use(notFoundHandler);
