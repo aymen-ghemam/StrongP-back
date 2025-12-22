@@ -9,18 +9,79 @@ const orderSchema = new Schema(
     },
     items: [
       {
-        product: {
+        productId: {
           type: Schema.Types.ObjectId,
           ref: "products",
           required: true,
         },
-        qty: {
+        name: {
+          type: String,
+          required: true,
+        },
+        price: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+        quantity: {
           type: Number,
           required: true,
           min: 1,
         },
+        image: {
+          type: String,
+        },
       },
     ],
+    shippingAddress: {
+      firstName: {
+        type: String,
+        required: true,
+      },
+      lastName: {
+        type: String,
+        required: true,
+      },
+      address: {
+        type: String,
+        required: true,
+      },
+      city: {
+        type: String,
+        required: true,
+      },
+      state: {
+        type: String,
+        required: true,
+      },
+      zipCode: {
+        type: String,
+        required: true,
+      },
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
+    paymentMethod: {
+      type: String,
+      enum: ["CASH_ON_DELIVERY", "CARD", "PAYPAL"],
+      default: "CASH_ON_DELIVERY",
+    },
+    subtotal: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    tax: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
     total: {
       type: Number,
       required: true,
@@ -28,21 +89,21 @@ const orderSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "shipped", "delivered", "cancelled"],
+      enum: [
+        "pending",
+        "confirmed",
+        "processing",
+        "shipped",
+        "delivered",
+        "cancelled",
+      ],
       default: "pending",
     },
-    shippingAddress: {
-      address: String,
-      city: String,
-      zipCode: String,
-    },
-    paymentMethod: {
+    notes: {
       type: String,
-      default: "onDelivery",
     },
-    notes: String,
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Order = model("orders", orderSchema);
