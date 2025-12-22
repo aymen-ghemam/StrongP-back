@@ -5,10 +5,11 @@ export function validateBodySchema(schema) {
     if (parsed.success) {
       next();
     } else {
+      const errorDetails = prettifyError(parsed.error);
       res.status(400).json({
         success: false,
-        message: "Validation failed",
-        error: prettifyError(parsed.error),
+        message: errorDetails,
+        error: errorDetails,
       });
     }
   };
@@ -21,10 +22,11 @@ export function validateQuerySchema(schema) {
       req.parsedQuery = parsed.data;
       next();
     } else {
+      const errorDetails = prettifyError(parsed.error);
       res.status(400).json({
         success: false,
-        message: "Validation failed",
-        error: prettifyError(parsed.error),
+        message: errorDetails,
+        error: errorDetails,
       });
     }
   };
@@ -35,10 +37,11 @@ export function validateParamsSchema(schema) {
     if (parsed.success) {
       next();
     } else {
+      const errorDetails = prettifyError(parsed.error);
       res.status(400).json({
         success: false,
-        message: "Validation failed",
-        error: prettifyError(parsed.error),
+        message: errorDetails,
+        error: errorDetails,
       });
     }
   };

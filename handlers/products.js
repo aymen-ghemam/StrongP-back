@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import Product from "../models/products.js";
+import Category from "../models/category.js";
 import { successResponse, errorResponse } from "../utils/responseFormatter.js";
 import { StatusCodes } from "http-status-codes";
 
@@ -14,6 +15,8 @@ export async function getProducts(req, res) {
       page = 1,
     } = req.query;
 
+    console.log("category", category);
+
     // Build filter
     const filter = {};
 
@@ -25,17 +28,24 @@ export async function getProducts(req, res) {
       ];
     }
 
-    // Filter by category ObjectId
+    // Filter by category (handle both ObjectId and category name)
     if (category) {
-      if (!Types.ObjectId.isValid(category)) {
-        return errorResponse(
-          res,
-          null,
-          "Invalid category ID",
-          StatusCodes.BAD_REQUEST
-        );
+      // Check if it's a valid ObjectId
+      if (Types.ObjectId.isValid(category)) {
+        filter.category = category;
+      } else {
+        // Otherwise, treat it as a category name and look it up
+        const categoryDoc = await Category.findOne({ name: category });
+        if (!categoryDoc) {
+          return errorResponse(
+            res,
+            null,
+            "Category not found",
+            StatusCodes.NOT_FOUND,
+          );
+        }
+        filter.category = categoryDoc._id;
       }
-      filter.category = category;
     }
 
     // Filter by status
@@ -59,7 +69,7 @@ export async function getProducts(req, res) {
         page: parseInt(page),
         pages: Math.ceil(total / parseInt(limit)),
       },
-      "Products fetched successfully"
+      "Products fetched successfully",
     );
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -67,7 +77,7 @@ export async function getProducts(req, res) {
       res,
       error,
       "Failed to fetch products",
-      StatusCodes.INTERNAL_SERVER_ERROR
+      StatusCodes.INTERNAL_SERVER_ERROR,
     );
   }
 }
@@ -81,7 +91,7 @@ export async function getProductById(req, res) {
         res,
         null,
         "Invalid product ID",
-        StatusCodes.BAD_REQUEST
+        StatusCodes.BAD_REQUEST,
       );
     }
 
@@ -92,7 +102,7 @@ export async function getProductById(req, res) {
         res,
         null,
         "Product not found",
-        StatusCodes.NOT_FOUND
+        StatusCodes.NOT_FOUND,
       );
     }
 
@@ -103,7 +113,7 @@ export async function getProductById(req, res) {
       res,
       error,
       "Failed to fetch product",
-      StatusCodes.INTERNAL_SERVER_ERROR
+      StatusCodes.INTERNAL_SERVER_ERROR,
     );
   }
 }
@@ -118,7 +128,7 @@ export async function createProduct(req, res) {
         res,
         null,
         "Missing required fields",
-        StatusCodes.BAD_REQUEST
+        StatusCodes.BAD_REQUEST,
       );
     }
 
@@ -128,7 +138,7 @@ export async function createProduct(req, res) {
         res,
         null,
         "Invalid category ID",
-        StatusCodes.BAD_REQUEST
+        StatusCodes.BAD_REQUEST,
       );
     }
 
@@ -150,7 +160,7 @@ export async function createProduct(req, res) {
       res,
       product,
       "Product created successfully",
-      StatusCodes.CREATED
+      StatusCodes.CREATED,
     );
   } catch (error) {
     console.error("Error creating product:", error);
@@ -158,7 +168,7 @@ export async function createProduct(req, res) {
       res,
       error,
       "Failed to create product",
-      StatusCodes.INTERNAL_SERVER_ERROR
+      StatusCodes.INTERNAL_SERVER_ERROR,
     );
   }
 }
@@ -174,7 +184,7 @@ export async function updateProduct(req, res) {
         res,
         null,
         "Invalid product ID",
-        StatusCodes.BAD_REQUEST
+        StatusCodes.BAD_REQUEST,
       );
     }
 
@@ -185,7 +195,7 @@ export async function updateProduct(req, res) {
         res,
         null,
         "Product not found",
-        StatusCodes.NOT_FOUND
+        StatusCodes.NOT_FOUND,
       );
     }
 
@@ -199,7 +209,7 @@ export async function updateProduct(req, res) {
           res,
           null,
           "Invalid category ID",
-          StatusCodes.BAD_REQUEST
+          StatusCodes.BAD_REQUEST,
         );
       }
       product.category = category;
@@ -218,7 +228,7 @@ export async function updateProduct(req, res) {
       res,
       error,
       "Failed to update product",
-      StatusCodes.INTERNAL_SERVER_ERROR
+      StatusCodes.INTERNAL_SERVER_ERROR,
     );
   }
 }
@@ -232,7 +242,7 @@ export async function deleteProduct(req, res) {
         res,
         null,
         "Invalid product ID",
-        StatusCodes.BAD_REQUEST
+        StatusCodes.BAD_REQUEST,
       );
     }
 
@@ -243,7 +253,7 @@ export async function deleteProduct(req, res) {
         res,
         null,
         "Product not found",
-        StatusCodes.NOT_FOUND
+        StatusCodes.NOT_FOUND,
       );
     }
 
@@ -254,7 +264,7 @@ export async function deleteProduct(req, res) {
       res,
       error,
       "Failed to delete product",
-      StatusCodes.INTERNAL_SERVER_ERROR
+      StatusCodes.INTERNAL_SERVER_ERROR,
     );
   }
 }
